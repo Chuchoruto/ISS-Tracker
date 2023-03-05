@@ -6,7 +6,7 @@ import math
 app = Flask(__name__)
 
 data = {}
-
+entire_data = {}
 
 def get_data() -> list:
     """
@@ -24,7 +24,23 @@ def get_data() -> list:
     data = xmltodict.parse(response.text)
     return data['ndm']['oem']['body']['segment']['data']['stateVector']
 
+def get_entire_data() -> dict:
+    """
+    This function returns the entire XML of data
+
+    Args:
+        NA
+        
+    Returns:
+        A dictionary with all of the data in the requested XML file 
+    """
+    url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
+    response = requests.get(url)
+    data = xmltodict.parse(response.text)
+    return data
+
 data = get_data()
+entire_data = get_entire_data()
 
 # This method is called in the default curl command w/o more arguments
 @app.route('/', methods = ['GET'])
@@ -150,8 +166,10 @@ def deleteData() -> str:
         Data Deleted Successfully or Data Already Deleted if calling the data variable causes a NameError
     """
     global data
+    global entire_data
     try:
         del data
+        del entire_data
     except NameError:
         return "Data has already been deleted. Repost first using /post-data\n"
     return "Data deleted successfully\n"
@@ -170,7 +188,9 @@ def postData() -> str:
         Data Posted Successfully after setting the global data variable to the dataset requested
     """
     global data
+    global entire_data
     data = get_data()
+    entire_data = get_entire_data()
     
     return "Data Posted Successfully\n"
 
@@ -209,6 +229,31 @@ def help() -> str:
     DELETE /delete-data
     Deletes the global data dictionary object.
     '''
+
+@app.route('/comment', methods=['GET'])
+def comment() -> list:
+    global entire_data
+    try:
+        return entire_data['ndm']['oem']['body']['segment']['data']['COMMENT']
+    except NameError:
+        return "Data has been deleted and must be reposted first using /post-data\n"
+
+
+@app.route('/header', methods=['GET'])
+def header() -> dict:
+    global entire_data
+    try:
+        return entire_data['ndm']['oem']['header']
+    except NameError:
+        return "Data has been deleted and must be reposted first using /post-data\n"
+
+@app.route('/metadata', methods=['GET'])
+def metadata() -> dict:
+    global entire_data
+    try:
+        return entire_data['ndm']['oem']['body']['segment']['metadata']
+    except NameError:
+        return "Data has been deleted and must be reposted first using /post-data\n"
 
 
 if __name__ == '__main__':
