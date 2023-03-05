@@ -2,8 +2,12 @@ from flask import Flask, request
 import xmltodict
 import requests
 import math
+from geopy.geocoders import Nominatim
+
 
 app = Flask(__name__)
+
+MEAN_EARTH_RADIUS = 6371
 
 data = {}
 entire_data = {}
@@ -255,6 +259,84 @@ def metadata() -> dict:
     except NameError:
         return "Data has been deleted and must be reposted first using /post-data\n"
 
+@app.route('/epochs/<epoch>/location', methods=['GET'])
+def get_Epoch_location(epoch: str):
+    global data
+    try:
+        for e in data:
+            if (e["EPOCH"] == epoch):
+                x = float(e["X"]["#text"])
+                y = float(e["Y"]["#text"])
+                z = float(e["Z"]["#text"])
+                hrs = int(epoch[9] + epoch[10])
+                mins = int(epoch[12] + epoch[13])
+                
+                lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))                
+                lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
+                alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS 
+
+                while(lon < -180):
+                    lon = lon + 360
+                while (lon > 180):
+                    lon = lon - 360
+                while (lat > 90):
+                    lat = lat - 180
+                while (lat < -90):
+                    lat = lat + 180
+
+                geocoder = Nominatim(user_agent='iss_tracker')
+                geoloc = geocoder.reverse((lat, lon), zoom=5, language='en')
+                try: 
+                    return {"Latitude": lat, "Longitude": lon, "Altitude": alt, "Geo": geoloc.address}
+                except AttributeError:
+                    return{"Latitude": lat, "Longitude": lon, "Altitude": alt, "Geo": "Over the Ocean"}
+                
+    except NameError:
+        return "Data has been deleted and must be reposted first using /post-data\n"
+    
+
+    
+    return "Error: Epoch not found\n"
+
+
+@app.route('/now', methods=['GET'])
+def get_Now(epoch: str):
+    global data
+    try:
+        
+        x = float(e["X"]["#text"])
+        y = float(e["Y"]["#text"])
+        z = float(e["Z"]["#text"])
+        hrs = int(epoch[9] + epoch[10])
+        mins = int(epoch[12] + epoch[13])
+        
+        lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))                
+        lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
+
+        while(lon < -180):
+            lon = lon + 360
+        while (lon > 180):
+            lon = lon - 360
+        while (lat > 90):
+            lat = lat - 180
+        while (lat < -90):
+            lat = lat + 180
+        
+        alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS 
+
+        geocoder = Nominatim(user_agent='iss_tracker')
+        geoloc = geocoder.reverse((lat, lon), zoom=5, language='en')
+        try: 
+            return {"Latitude": lat, "Longitude": lon, "Altitude": alt, "Geo": geoloc.address}
+        except AttributeError:
+            return{"Latitude": lat, "Longitude": lon, "Altitude": alt, "Geo": "Over the Ocean"}
+        
+    except NameError:
+        return "Data has been deleted and must be reposted first using /post-data\n"
+    
+
+    
+    return "Error: Epoch not found\n"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
