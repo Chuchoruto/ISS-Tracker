@@ -3,7 +3,7 @@ import xmltodict
 import requests
 import math
 from geopy.geocoders import Nominatim
-
+import time
 
 app = Flask(__name__)
 
@@ -272,7 +272,7 @@ def get_Epoch_location(epoch: str):
                 mins = int(epoch[12] + epoch[13])
                 
                 lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))                
-                lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
+                lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 32
                 alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS 
 
                 while(lon < -180):
@@ -300,18 +300,25 @@ def get_Epoch_location(epoch: str):
 
 
 @app.route('/now', methods=['GET'])
-def get_Now(epoch: str):
+def get_Now():
     global data
     try:
-        
-        x = float(e["X"]["#text"])
-        y = float(e["Y"]["#text"])
-        z = float(e["Z"]["#text"])
-        hrs = int(epoch[9] + epoch[10])
-        mins = int(epoch[12] + epoch[13])
+        time_now = time.time()
+        for e in data:
+            epoch_time = time.mktime(time.strptime(e['EPOCH'] [:-5], '%Y-%jT%H:%M:%S'))
+            difference = abs(epoch_time-time_now)
+            if (difference < 120):
+                seconds = difference
+                epoch = e
+        epoch_name = epoch['EPOCH']
+        x = float(epoch["X"]["#text"])
+        y = float(epoch["Y"]["#text"])
+        z = float(epoch["Z"]["#text"])
+        hrs = int(epoch_name[9] + epoch_name[10])
+        mins = int(epoch_name[12] + epoch_name[13])
         
         lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))                
-        lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 24
+        lon = math.degrees(math.atan2(y, x)) - ((hrs-12)+(mins/60))*(360/24) + 32
 
         while(lon < -180):
             lon = lon + 360
@@ -327,9 +334,9 @@ def get_Now(epoch: str):
         geocoder = Nominatim(user_agent='iss_tracker')
         geoloc = geocoder.reverse((lat, lon), zoom=5, language='en')
         try: 
-            return {"Latitude": lat, "Longitude": lon, "Altitude": alt, "Geo": geoloc.address}
+            return {"Closest Epoch": epoch_name, "Seconds from now": seconds, "Latitude": lat, "Longitude": lon, "Altitude": {"Value": alt, "units": "km"}, "Geo": geoloc.address}
         except AttributeError:
-            return{"Latitude": lat, "Longitude": lon, "Altitude": alt, "Geo": "Over the Ocean"}
+            return {"Closest Epoch": epoch_name, "Seconds from now": seconds, "Location": {"Latitude": lat, "Longitude": lon, "Altitude": {"Value": alt, "units": "km"}, "Geo": "Over the Ocean"}}
         
     except NameError:
         return "Data has been deleted and must be reposted first using /post-data\n"
