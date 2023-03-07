@@ -334,7 +334,7 @@ def get_Now():
         geocoder = Nominatim(user_agent='iss_tracker')
         geoloc = geocoder.reverse((lat, lon), zoom=5, language='en')
         try: 
-            return {"Closest Epoch": epoch_name, "Seconds from now": seconds, "Latitude": lat, "Longitude": lon, "Altitude": {"Value": alt, "units": "km"}, "Geo": geoloc.address}
+            return {"Closest Epoch": epoch_name, "Seconds from now": seconds, "Location": {"Latitude": lat, "Longitude": lon, "Altitude": {"Value": alt, "units": "km"}, "Geo": geoloc.address}}
         except AttributeError:
             return {"Closest Epoch": epoch_name, "Seconds from now": seconds, "Location": {"Latitude": lat, "Longitude": lon, "Altitude": {"Value": alt, "units": "km"}, "Geo": "Over the Ocean"}}
         
