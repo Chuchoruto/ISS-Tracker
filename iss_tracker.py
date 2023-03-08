@@ -236,6 +236,15 @@ def help() -> str:
 
 @app.route('/comment', methods=['GET'])
 def comment() -> list:
+    """
+    This returns the comment recorded in the XML data file for the ISS
+
+    Args:
+        NA
+        
+    Returns:
+        List of the comments recorded in the XML data.
+    """
     global entire_data
     try:
         return entire_data['ndm']['oem']['body']['segment']['data']['COMMENT']
@@ -245,6 +254,15 @@ def comment() -> list:
 
 @app.route('/header', methods=['GET'])
 def header() -> dict:
+    """
+    This returns the header recorded in the XML data file for the ISS
+
+    Args:
+        NA
+        
+    Returns:
+        The header of the XML data in dictionary format
+    """
     global entire_data
     try:
         return entire_data['ndm']['oem']['header']
@@ -253,6 +271,15 @@ def header() -> dict:
 
 @app.route('/metadata', methods=['GET'])
 def metadata() -> dict:
+    """
+    This returns the metadata recorded in the XML data file for the ISS
+
+    Args:
+        NA
+        
+    Returns:
+        The metadata of the XML data in dictionary format
+    """
     global entire_data
     try:
         return entire_data['ndm']['oem']['body']['segment']['metadata']
@@ -261,6 +288,19 @@ def metadata() -> dict:
 
 @app.route('/epochs/<epoch>/location', methods=['GET'])
 def get_Epoch_location(epoch: str):
+    """
+    This returns relevant epoch location data from the dataset for the ISS
+
+    Args:
+        Epoch (String): The time stamp of the ISS data
+        
+    Returns:
+        In dictionary format the following:
+            Latitude: In degrees
+            Longitude: In degrees
+            Altitude: Altitude from sea level (km)
+            Geolocation: Position over Earth
+    """
     global data
     try:
         for e in data:
@@ -301,6 +341,23 @@ def get_Epoch_location(epoch: str):
 
 @app.route('/now', methods=['GET'])
 def get_Now():
+    """
+    This returns relevant epoch location data from the epoch that is closest to the current time
+
+    Args:
+        NA
+        
+    Returns:
+        In dictionary format the following:
+            Location:
+                Latitude: In degrees
+                Longitude: In degrees
+                Altitude: Altitude from sea level (km)
+                Geolocation: Position over Earth
+            Closest Epoch: Written in standard epoch notation
+            Seconds from now: (s)
+
+    """
     global data
     try:
         time_now = time.time()
