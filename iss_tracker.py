@@ -364,7 +364,7 @@ def get_Now():
         for e in data:
             epoch_time = time.mktime(time.strptime(e['EPOCH'] [:-5], '%Y-%jT%H:%M:%S'))
             difference = abs(epoch_time-time_now)
-            if (difference < 120):
+            if (difference <= 120):
                 seconds = difference
                 epoch = e
         epoch_name = epoch['EPOCH']
