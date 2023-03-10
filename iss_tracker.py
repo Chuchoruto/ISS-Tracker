@@ -232,6 +232,21 @@ def help() -> str:
     
     DELETE /delete-data
     Deletes the global data dictionary object.
+
+    GET /comment
+    Gets a list of comments describing values and constants in the data set
+
+    GET /header
+    Gets the header of the data set
+
+    GET /metadata
+    Gets the metadata of the set
+
+    GET /now
+    Returns latitude, longitude, altitude, geoposition of the Epoch closest to the current time
+
+    GET /epochs/<epoch>/location
+    Returns latitude, longitude, altitude, geoposition of the specific Epoch
     '''
 
 @app.route('/comment', methods=['GET'])
