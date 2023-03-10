@@ -8,5 +8,5 @@ services:
             dockerfile: ./Dockerfile
         ports:
             - 5000:5000
-        image: lucalabardini/iss_tracker:current
+        image: lucalabardini/iss_tracker_completed:project
         
