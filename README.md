@@ -42,8 +42,26 @@ The Flask App I have created runs the app on a local port and actively queries d
 
 ### INSTRUCTIONS TO RUN
 
+#### Method 1 (Preferred) - Docker-compose
 
-#### Method 1 - Installing Dpendencies Manually
+Pull the docker image from dockerhub using
+```
+docker pull lucalabardini/iss_tracker_completed:project
+```
+
+Then simply type in the terminal:
+
+```
+docker-compose up
+```
+
+Then in a separate terminal run curl commands such as
+```
+curl 'localhost:5000/help'
+```
+
+
+#### Method 2 - Installing Dpendencies Manually
 
 Installations Necessary
 
@@ -59,6 +77,10 @@ pip3 install requests
 pip3 install xmltodict
 ```
 
+```
+pip3 install geopy
+```
+
 Run the following code in the terminal to begin the flask app
 ```
 flask --app iss_tracker --debug run
@@ -69,7 +91,7 @@ Then in a separate terminal run curl commands such as
 curl 'localhost:5000/help'
 ```
 
-#### Method 2 - Pulling prebuilt Docker image from Dockerhub and running Flask app
+#### Method 3 - Pulling prebuilt Docker image from Dockerhub and running Flask app
 
 Run the following commands in terminal:
 
@@ -88,7 +110,7 @@ Then in a separate terminal run curl commands such as
 curl 'localhost:5000/help'
 ```
 
-#### Method 3 - Building image from dockerfile
+#### Method 4 - Building image from dockerfile
 
 Make sure you are in the directory with the dockerfile and iss_tracker.py script
 
