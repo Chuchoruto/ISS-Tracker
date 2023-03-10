@@ -1,7 +1,7 @@
 
 # ISS TRACKER
 
-This project provides relevant data to the user about the ISS. It helps determine the speed and location of the ISS at given times
+This project provides relevant data to the user about the ISS. It provides the speed, location, geopsition of the ISS at given times or the current time
 
 ### Data Used
 
@@ -31,9 +31,14 @@ The Flask App I have created runs the app on a local port and actively queries d
 | `/epochs`   | GET | All Epochs in the Dataset        |
 | `/epochs/<epoch>`| GET | State Vector of the specific Epoch |
 | `/epochs/<epoch>/speed` | GET | Speed of the specific Epoch |
+| `/epochs/<epoch>/location` | GET | Latitude, longitude, altitude, geoposition of the specific Epoch |
 | `/help` | GET | Returns help text (as a string) that briefly describes each route |
 | `/delete-data` | DELETE | Deletes all data from the dictionary object |
 | `/post-data` | POST | Reloads the dictionary object with data from the web |
+| `/comment` | GET | Reloads the dictionary object with data from the web |
+| `/header` | GET | Reloads the dictionary object with data from the web |
+| `/metadata` | GET | Reloads the dictionary object with data from the web |
+| `/now` | GET | Latitude, longitude, altitude, geoposition of the Epoch closest to the current time |
 
 ### INSTRUCTIONS TO RUN
 
