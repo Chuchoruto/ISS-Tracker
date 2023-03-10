@@ -35,9 +35,9 @@ The Flask App I have created runs the app on a local port and actively queries d
 | `/help` | GET | Returns help text (as a string) that briefly describes each route |
 | `/delete-data` | DELETE | Deletes all data from the dictionary object |
 | `/post-data` | POST | Reloads the dictionary object with data from the web |
-| `/comment` | GET | Reloads the dictionary object with data from the web |
-| `/header` | GET | Reloads the dictionary object with data from the web |
-| `/metadata` | GET | Reloads the dictionary object with data from the web |
+| `/comment` | GET | Gets a list of comments describing values and constants in the data set |
+| `/header` | GET | The header of the data set |
+| `/metadata` | GET | The metadata of the set |
 | `/now` | GET | Latitude, longitude, altitude, geoposition of the Epoch closest to the current time |
 
 ### INSTRUCTIONS TO RUN
@@ -97,12 +97,12 @@ Run the following commands in terminal:
 
 Pull docker image from docker hub
 ```
-docker pull lucalabardini/iss_tracker:hw05
+docker pull lucalabardini/iss_tracker_completed:project
 ```
 
 Run the Flask app using the prebuilt image
 ```
-docker run -it --rm -p 5000:5000 lucalabardini/iss_tracker:hw05
+docker run -it --rm -p 5000:5000 lucalabardini/iss_tracker_completed:project
 ```
 
 Then in a separate terminal run curl commands such as
@@ -124,12 +124,12 @@ Dockerfile README.md iss_tracker.py
 
 Build your image using the dockerfile
 ```
-docker build -t <username>/iss_tracker:<tag> .
+docker build -t <username>/iss_tracker_tracker:<tag> .
 ```
 
 Run the Flask app using the newly built image
 ```
-docker run -it --rm -p 5000:5000 <username>/iss_tracker:<tag>
+docker run -it --rm -p 5000:5000 <username>/iss_tracker_completed:<tag>
 ```
 
 Then in a separate terminal run curl commands such as
@@ -252,7 +252,7 @@ Will return
 
 Running the command:
 ```
-curl 'localhost:5000/epochs/<epoch>'
+curl localhost:5000/epochs/<epoch>
 ```
 Should return the state vector of the specific epoch specified in the angled brackets which will look like this
 ```
@@ -319,3 +319,112 @@ Should return
 Data Posted Successfully
 ```
 This means that the data was reloaded into the flask app and all of the other routes will now work properly again
+
+
+Running the following command:
+```
+curl 'localhost:5000/comment'
+```
+Should return some comment data like this
+```
+[
+  "Units are in kg and m^2",
+  "MASS=473291.00",
+  "DRAG_AREA=1421.50",
+  "DRAG_COEFF=2.80",
+  "SOLAR_RAD_AREA=0.00",
+  "SOLAR_RAD_COEFF=0.00",
+  "Orbits start at the ascending node epoch",
+  "ISS first asc. node: EPOCH = 2023-03-08T12:50:10.295 $ ORBIT = 2617 $ LAN(DEG) = 108.61247",
+  "ISS last asc. node : EPOCH = 2023-03-23T11:58:44.947 $ ORBIT = 2849 $ LAN(DEG) = 32.65474",
+  "Begin sequence of events",
+  "TRAJECTORY EVENT SUMMARY:",
+  null,
+  "|       EVENT        |       TIG        | ORB |   DV    |   HA    |   HP    |",
+  "|                    |       GMT        |     |   M/S   |   KM    |   KM    |",
+  "|                    |                  |     |  (F/S)  |  (NM)   |  (NM)   |",
+  "=============================================================================",
+  "GMT067 Reboost        067:19:47:00.000             0.6     428.1     408.4",
+  "(2.0)   (231.1)   (220.5)",
+  null,
+  "Crew05 Undock         068:22:00:00.000             0.0     428.7     409.6",
+  "(0.0)   (231.5)   (221.2)",
+  null,
+  "SpX27 Launch          074:00:30:00.000             0.0     428.3     408.7",
+  "(0.0)   (231.2)   (220.7)",
+  null,
+  "SpX27 Docking         075:12:00:00.000             0.0     428.2     408.6",
+  "(0.0)   (231.2)   (220.6)",
+  null,
+  "=============================================================================",
+  "End sequence of events"
+]
+```
+
+Running the following command:
+```
+curl 'localhost:5000/header'
+```
+should return the header data of the set as seen below
+```
+{
+  "CREATION_DATE": "2023-067T21:02:49.080Z",
+  "ORIGINATOR": "JSC"
+}
+```
+
+Running the following command:
+```
+curl 'localhost:5000/metadata'
+```
+should return the metadata of the data set as seen below
+```
+{
+  "CENTER_NAME": "EARTH",
+  "OBJECT_ID": "1998-067-A",
+  "OBJECT_NAME": "ISS",
+  "REF_FRAME": "EME2000",
+  "START_TIME": "2023-067T12:00:00.000Z",
+  "STOP_TIME": "2023-082T12:00:00.000Z",
+  "TIME_SYSTEM": "UTC"
+}
+```
+
+Running the following command:
+```
+curl localhost:5000/epochs/"2023-067T12:00:00.000Z"/location
+```
+should return
+```
+{
+  "Altitude": 426.6207371384162,
+  "Geo": "Over the Ocean",
+  "Latitude": 11.029159199242079,
+  "Longitude": -49.867905190541975
+}
+```
+
+Running the following command:
+```
+curl localhost:5000/now
+```
+should return the relevant information about where the ISS is at the EPOCH closest to now
+```
+{
+  "Closest Epoch": "2023-069T03:00:00.000Z",
+  "Location": {
+    "Altitude": {
+      "Value": 434.35872784130515,
+      "units": "km"
+    },
+    "Geo": "Over the Ocean",
+    "Latitude": -39.595735731536436,
+    "Longitude": 126.65259420509258
+  },
+  "Seconds from now": 26.418091535568237
+}
+```
+
+
+
+
